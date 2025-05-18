@@ -1,8 +1,9 @@
-package app
+package db
 
 import (
 	"errors"
 
+	"github.com/bruno-holanda15/api-rest-challenge-rocketseat/app/entities"
 	"github.com/google/uuid"
 )
 
@@ -16,33 +17,27 @@ func (id ID) String() string {
 	return uuid.UUID(id).String()
 }
 
-type User struct {
-	FirstName string `json:"first_name,omitempty"`
-	LastName  string `json:"last_name,omitempty"`
-	Biography string `json:"biography,omitempty"`
-}
-
 type AppStorage struct {
-	Data map[ID]User
+	Data map[ID]entities.User
 }
 
 func NewAppStorage() *AppStorage {
-	data := make(map[ID]User)
+	data := make(map[ID]entities.User)
 	return &AppStorage{Data: data}
 }
 
-func (d *AppStorage) Insert(user User) ID {
+func (d *AppStorage) Insert(user entities.User) ID {
 	newID := uuid.New()
 	d.Data[ID(newID)] = user
 
 	return ID(newID)
 }
 
-func (d *AppStorage) FindById(id ID) (User, error) {
+func (d *AppStorage) FindById(id ID) (entities.User, error) {
 	user, ok := d.Data[id]
 	if ok {
 		return user, nil
 	}
-	
-	return User{}, ErrUserNotFound
+
+	return entities.User{}, ErrUserNotFound
 }

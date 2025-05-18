@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/bruno-holanda15/api-rest-challenge-rocketseat/api"
+	"github.com/bruno-holanda15/api-rest-challenge-rocketseat/infra/api"
 )
 
 func main() {
