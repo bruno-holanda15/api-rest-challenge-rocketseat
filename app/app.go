@@ -1,8 +1,20 @@
 package app
 
-import "github.com/google/uuid"
+import (
+	"errors"
+
+	"github.com/google/uuid"
+)
 
 type ID uuid.UUID
+
+var (
+	ErrUserNotFound = errors.New("user not found")
+)
+
+func (id ID) String() string {
+	return uuid.UUID(id).String()
+}
 
 type User struct {
 	FirstName string `json:"first_name,omitempty"`
@@ -19,7 +31,18 @@ func NewAppStorage() *AppStorage {
 	return &AppStorage{Data: data}
 }
 
-func (d *AppStorage) Insert(user User) {
+func (d *AppStorage) Insert(user User) ID {
 	newID := uuid.New()
 	d.Data[ID(newID)] = user
+
+	return ID(newID)
+}
+
+func (d *AppStorage) FindById(id ID) (User, error) {
+	user, ok := d.Data[id]
+	if ok {
+		return user, nil
+	}
+	
+	return User{}, ErrUserNotFound
 }
