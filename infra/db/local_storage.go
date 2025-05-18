@@ -41,3 +41,13 @@ func (d *AppStorage) FindById(id ID) (entities.User, error) {
 
 	return entities.User{}, ErrUserNotFound
 }
+
+func (d *AppStorage) Delete(id ID) error {
+	_, ok := d.Data[id]
+	if ok {
+		delete(d.Data, id)
+		return nil
+	}
+	
+	return ErrUserNotFound
+}

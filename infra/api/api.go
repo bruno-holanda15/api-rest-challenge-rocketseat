@@ -28,6 +28,7 @@ func NewHTTPHandler() http.Handler {
 	r.Route("/api", func(r chi.Router) {
 		r.Post("/users", InserUser(db))
 		r.Get("/users/{id}", GetUser(db))
+		r.Delete("/users/{id}", DeleteUser(db))
 	})
 
 	return r
@@ -101,3 +102,37 @@ func GetUser(db *dbLocal.AppStorage) http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 	}
 }
+
+
+func DeleteUser(db *dbLocal.AppStorage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := chi.URLParam(r, "id")
+		if id == "" {
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte("user not found"))
+			return
+		}
+
+		uuid, err := uuid.Parse(id)
+		if err != nil {
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			_, _ = w.Write([]byte("id provided not uuid valid"))
+			return
+		}
+
+		err = db.Delete(dbLocal.ID(uuid))
+		if err != nil {
+			if errors.Is(err, dbLocal.ErrUserNotFound) {
+				w.WriteHeader(http.StatusNotFound)
+				_, _ = w.Write([]byte("user not found"))
+				return
+			}
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
